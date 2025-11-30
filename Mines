@@ -98,7 +98,7 @@ getKeyButton.Parent = frame
 
 local function setClipboardWithURL()
     
-    setclipboard("keysitehere")
+setclipboard("https://k2x6yi.mimo.run/index.html")
     
 end
 
