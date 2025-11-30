@@ -16,18 +16,18 @@ local Window = Rayfield:CreateWindow({
     },
     Discord = {
         Enabled = true,
-        Invite = "https://discord.gg/uNWjWnuK4",
+        Invite = "x7qHNzJpd",
         RememberJoins = true
     },
-    KeySystem = true,
+    KeySystem = false,
     KeySettings = {
         Title = "Trix Hub",
         Subtitle = "Key System",
         Note = "Join the discord to get the key ok?",
         FileName = "Key",
         SaveKey = true,
-        GrabKeyFromSite = false,
-        Key = {"meekid choap party"}
+        GrabKeyFromSite = true,
+        Key = {"https://k2x6yi.mimo.run/index.html"}
     }
 })
 
