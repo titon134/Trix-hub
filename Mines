@@ -41,6 +41,7 @@ local MainTab = Window:CreateTab("⛏️Main", 4483362458)
 local TpTab = Window:CreateTab("🗺️Teleport", 4483362458)
 local CharacterTab = Window:CreateTab("👤Character", 4483362458)
 local MiscTab = Window:CreateTab("Misc", 4483362458)
+local SuprtTab = Window:CreateTab("Support", 4483362458)
 
 local Toggle = MainTab:CreateToggle({
     Name = "Auto Bring Ores",
@@ -246,5 +247,14 @@ local Button = MiscTab:CreateButton({
         
         wait(0.5)
         TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
+    end,
+})
+
+local Label = SuprtTab:CreateLabel("If you wanna support me then click here⬇️⬇️", 4483362458, Color3.fromRGB(150, 150, 150), false)
+
+local Button = SuprtTab:CreateButton({
+    Name = "Button Example",
+    Callback = function()
+        setclipboard("https://discord.gg/x7qHNzJpd")
     end,
 })
