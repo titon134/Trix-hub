@@ -1,260 +1,229 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-local Window = Rayfield:CreateWindow({
-    Name = "Trix Hub",
-    Icon = 0,
-    LoadingTitle = "Trixity",
-    LoadingSubtitle = "by Sickma(tt)",
-    ShowText = "Trix Hub",
-    Theme = "Default",
-    ToggleUIKeybind = "Z",
-    DisableRayfieldPrompts = false,
-    DisableBuildWarnings = true,
-    ConfigurationSaving = {
-        Enabled = true,
-        FolderName = "Trix",
-        FileName = "Config saving"
-    },
-    Discord = {
-        Enabled = true,
-        Invite = "x7qHNzJpd",
-        RememberJoins = true
-    },
-    KeySystem = false,
-    KeySettings = {
-        Title = "Trix Hub",
-        Subtitle = "Key System",
-        Note = "Join the discord to get the key ok?",
-        FileName = "Key",
-        SaveKey = true,
-        GrabKeyFromSite = true,
-        Key = {"https://k2x6yi.mimo.run/index.html"}
-    }
-})
+local screenGui = Instance.new("ScreenGui")
 
-local TpLocations = {
-    ["Advance Pickaxes Shop"] = CFrame.new(1044.08899, 244.663666, -276.665619),
-    ["Advance Radar Shop"] = CFrame.new(1089.94641, 244.908905, -475.637329),
-    ["Drill Shop"] = CFrame.new(912.719299, 244.648285, -461.667969)
-}
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
-local MainTab = Window:CreateTab("⛏️Main", 4483362458)
-local TpTab = Window:CreateTab("🗺️Teleport", 4483362458)
-local CharacterTab = Window:CreateTab("👤Character", 4483362458)
-local MiscTab = Window:CreateTab("Misc", 4483362458)
-local SuprtTab = Window:CreateTab("Support", 4483362458)
 
-local Toggle = MainTab:CreateToggle({
-    Name = "Auto Bring Ores",
-    CurrentValue = false,
-    Flag = "AutoBringOres",
-    Callback = function(Val)
-        AutoBringOres = Val
-        Rayfield:Notify({
-            Title = "Auto Bring Ores",
-            Content = "It'll collect NEAR ores",
-            Duration = 5,
-            Image = 4483362458,
-        })
-    end,
-})
 
-spawn(function()
-    while task.wait() do
-        if AutoBringOres then
-            pcall(function()
-                for i,v in pairs (workspace.Items:GetChildren()) do
-                    if v.Name then
-                        v.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
-                    end
-                end
-            end)
-        end
-    end
-end)
+local frame = Instance.new("Frame")
 
-local Button = MainTab:CreateButton({
-    Name = "Sell Inventory",
-    Callback = function()
-        local LastPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+frame.Size = UDim2.new(0.3, 0, 0.4, 0)
+
+frame.Position = UDim2.new(0.35, 0, 0.3, 0)
+
+frame.BackgroundColor3 = Color3.new(0, 0, 0)
+
+frame.Parent = screenGui
+
+
+
+local title = Instance.new("TextLabel")
+
+title.Size = UDim2.new(1, 0, 0.2, 0)
+
+title.Position = UDim2.new(0, 0, 0, 0)
+
+title.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+
+title.Text = "Key System"
+
+title.TextColor3 = Color3.new(1, 1, 1)
+
+title.Font = Enum.Font.GothamBlack
+
+title.TextSize = 24
+
+title.Parent = frame
+
+
+
+local textBox = Instance.new("TextBox")
+
+textBox.Size = UDim2.new(0.8, 0, 0.2, 0)
+
+textBox.Position = UDim2.new(0.1, 0, 0.3, 0)
+
+textBox.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+
+textBox.Text = "Paste Here"
+
+textBox.TextColor3 = Color3.new(1, 1, 1)
+
+textBox.Font = Enum.Font.GothamBlack
+
+textBox.TextSize = 18
+
+textBox.Parent = frame
+
+
+
+local enterKeyButton = Instance.new("TextButton")
+
+enterKeyButton.Size = UDim2.new(0.8, 0, 0.15, 0)
+
+enterKeyButton.Position = UDim2.new(0.1, 0, 0.55, 0)
+
+enterKeyButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+
+enterKeyButton.Text = "Enter Key"
+
+enterKeyButton.TextColor3 = Color3.new(1, 1, 1)
+
+enterKeyButton.Font = Enum.Font.GothamBlack
+
+enterKeyButton.TextSize = 18
+
+enterKeyButton.Parent = frame
+
+
+
+local getKeyButton = Instance.new("TextButton")
+
+getKeyButton.Size = UDim2.new(0.8, 0, 0.15, 0)
+
+getKeyButton.Position = UDim2.new(0.1, 0, 0.75, 0)
+
+getKeyButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+
+getKeyButton.Text = "Get Key"
+
+getKeyButton.TextColor3 = Color3.new(1, 1, 1)
+
+getKeyButton.Font = Enum.Font.GothamBlack
+
+getKeyButton.TextSize = 18
+
+getKeyButton.Parent = frame
+
+
+
+local function setClipboardWithURL()
+    
+    setclipboard("keysitehere")
+    
+end
+
+
+
+getKeyButton.MouseButton1Click:Connect(setClipboardWithURL)
+
+
+
+local function sendNotification(title, text, duration)
+    
+    game.StarterGui:SetCore("SendNotification", {
         
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1020, 245, -65)
-        wait(0.45)
-        game:GetService("ReplicatedStorage"):WaitForChild("Ml"):WaitForChild("SellInventory"):FireServer()
-        wait(0.26)
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = LastPos
-    end,
-})
+        Title = title;
+        
+        Text = text;
+        
+        Duration = duration;
+        
+    })
+    
+end
 
-local Dropdown = TpTab:CreateDropdown({
-    Name = "Teleport To ... in World 1",
-    Options = {"Advance Pickaxes Shop","Advance Radar Shop","Drill Shop"},
-    CurrentOption = {"Advance Pickaxes Shop"},
-    MultipleOptions = false,
-    Flag = "Tp",
-    Callback = function(Options)
-        local locationName = Options[1]
-        if TpLocations[locationName] then
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = TpLocations[locationName]
-        end
-    end,
-})
 
-local Slider = CharacterTab:CreateSlider({
-    Name = "Walk Speed",
-    Range = {0, 1000},
-    Increment = 1,
-    Suffix = "Walk Speed",
-    CurrentValue = 16,
-    Flag = "Ws",
-    Callback = function(Val)
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Val
-    end,
-})
 
-local Slider = CharacterTab:CreateSlider({
-    Name = "Jump Power",
-    Range = {0, 1000},
-    Increment = 1,
-    Suffix = "Jump Power",
-    CurrentValue = 50,
-    Flag = "Jp",
-    Callback = function(Val)
-        local humanoid = game.Players.LocalPlayer.Character.Humanoid
-        humanoid.UseJumpPower = true
-        humanoid.JumpPower = Val
-    end,
-})
-
-local Toggle = CharacterTab:CreateToggle({
-    Name = "Infinite Jump",
-    CurrentValue = false,
-    Flag = "InfJump",
-    Callback = function(Value)
-        InfJumpEnabled = Value
-        game:GetService("UserInputService").JumpRequest:connect(function()
-            if InfJumpEnabled then
-                game:GetService"Players".LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
-            end
+local function enterKey()
+    
+    local userInputKey = textBox.Text
+    
+    local correctKey = "meekid choap party"
+    
+    
+    
+    if userInputKey == correctKey then
+        
+        local scriptURL = "https://raw.githubusercontent.com/titon134/Trix-hub/refs/heads/main/Mines"
+        
+        local success, result = pcall(function()
+            
+            return loadstring(game:HttpGet(scriptURL))()
+            
         end)
-    end,
-})
-
-local NoclipEnabled = false
-
-local Toggle = CharacterTab:CreateToggle({
-    Name = "Noclip",
-    CurrentValue = false,
-    Flag = "nc",
-    Callback = function(Value)
-        NoclipEnabled = Value
-    end,
-})
-
-game:GetService("RunService").Stepped:Connect(function()
-    if NoclipEnabled then
-        pcall(function()
-            for _, part in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = false
-                end
-            end
-        end)
-    end
-end)
-
-local PotatoModeEnabled = false
-
-local Toggle = MiscTab:CreateToggle({
-    Name = "Potato Mode (FPS Boost)",
-    CurrentValue = false,
-    Flag = "PotatoMode",
-    Callback = function(Value)
-        PotatoModeEnabled = Value
         
-        local lighting = game:GetService("Lighting")
-        local terrain = workspace.Terrain
         
-        if Value then
-            settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+        
+        if success then
             
-            for _, effect in pairs(lighting:GetChildren()) do
-                if effect:IsA("BloomEffect") or effect:IsA("BlurEffect") or 
-                effect:IsA("ColorCorrectionEffect") or effect:IsA("SunRaysEffect") or
-                effect:IsA("DepthOfFieldEffect") then
-                    effect.Enabled = false
-                end
-            end
+            screenGui:Destroy()
             
-            terrain.WaterWaveSize = 0
-            terrain.WaterWaveSpeed = 0
-            terrain.WaterReflectance = 0
-            terrain.WaterTransparency = 0
-            
-            lighting.GlobalShadows = false
-            lighting.FogEnd = 99
-            lighting.Brightness = 0
-            
-            Rayfield:Notify({
-                Title = "Potato Mode",
-                Content = "Enabled - Graphics reduced for better FPS",
-                Duration = 4,
-                Image = 4483362458,
-            })
         else
             
-            settings().Rendering.QualityLevel = Enum.QualityLevel.Automatic
+            sendNotification("Error", "Failed to load script. Check the console for details.", 10)
             
-            for _, effect in pairs(lighting:GetChildren()) do
-                if effect:IsA("BloomEffect") or effect:IsA("BlurEffect") or 
-                effect:IsA("ColorCorrectionEffect") or effect:IsA("SunRaysEffect") or
-                effect:IsA("DepthOfFieldEffect") then
-                    effect.Enabled = true
-                end
+        end
+        
+    else
+        
+        sendNotification("Wrong Key", "You entered the wrong key!", 10)
+        
+    end
+    
+end
+
+
+
+enterKeyButton.MouseButton1Click:Connect(enterKey)
+
+
+
+local dragging, dragInput, dragStart, startPos
+
+
+
+local function update(input)
+    
+    local delta = input.Position - dragStart
+    
+    frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    
+end
+
+
+
+title.InputBegan:Connect(function(input)
+    
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        
+        dragging, dragStart, startPos = true, input.Position, frame.Position
+        
+        
+        
+        input.Changed:Connect(function()
+            
+            if input.UserInputState == Enum.UserInputState.End then
+                
+                dragging = false
+                
             end
             
-            terrain.WaterWaveSize = 0.05
-            terrain.WaterWaveSpeed = 10
-            terrain.WaterReflectance = 1
-            terrain.WaterTransparency = 0.3
-            
-            lighting.GlobalShadows = true
-            lighting.FogEnd = 100000
-            lighting.Brightness = 2
-            
-            Rayfield:Notify({
-                Title = "Potato Mode",
-                Content = "Disabled - Graphics restored",
-                Duration = 4,
-                Image = 4483362458,
-            })
-        end
-    end,
-})
-
-local Button = MiscTab:CreateButton({
-    Name = "Rejoin Server",
-    Callback = function()
-        local TeleportService = game:GetService("TeleportService")
-        local Players = game:GetService("Players")
-        local LocalPlayer = Players.LocalPlayer
+        end)
         
-        Rayfield:Notify({
-            Title = "Rejoining",
-            Content = "Rejoining the server...",
-            Duration = 3,
-            Image = 4483362458,
-        })
+    end
+    
+end)
+
+
+
+title.InputChanged:Connect(function(input)
+    
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
         
-        wait(0.5)
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
-    end,
-})
+        dragInput = input
+        
+    end
+    
+end)
 
-local Label = SuprtTab:CreateLabel("If you wanna support me then click here⬇️⬇️", 4483362458, Color3.fromRGB(150, 150, 150), false)
 
-local Button = SuprtTab:CreateButton({
-    Name = "Button Example",
-    Callback = function()
-        setclipboard("https://discord.gg/x7qHNzJpd")
-    end,
-})
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+
+    if dragging and input == dragInput then
+
+        update(input)
+
+    end
+
+end)
