@@ -134,7 +134,7 @@ local function enterKey()
     
     if userInputKey == correctKey then
         
-        local scriptURL = "https://raw.githubusercontent.com/titon134/Trix-hub/refs/heads/main/Mines"
+        local scriptURL = "https://raw.githubusercontent.com/TTsudloah174/Trix-Hub-actual-script-/refs/heads/main/Mines"
         
         local success, result = pcall(function()
             
