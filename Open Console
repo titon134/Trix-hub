@@ -1,0 +1,447 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local LogService = game:GetService("LogService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Create ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "DeveloperConsole"
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.Parent = playerGui
+
+-- Mobile Toggle Button
+local toggleButton = Instance.new("TextButton")
+toggleButton.Name = "ToggleButton"
+toggleButton.Size = UDim2.new(0, 60, 0, 60)
+toggleButton.Position = UDim2.new(1, -70, 0, 10)
+toggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+toggleButton.BorderSizePixel = 0
+toggleButton.Text = ">"
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.TextSize = 24
+toggleButton.Font = Enum.Font.GothamBold
+toggleButton.Parent = screenGui
+
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(0, 8)
+toggleCorner.Parent = toggleButton
+
+-- Main Console Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "ConsoleFrame"
+mainFrame.Size = UDim2.new(0, 700, 0, 450)
+mainFrame.Position = UDim2.new(0.5, -350, 0.5, -225)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+mainFrame.BorderSizePixel = 0
+mainFrame.Visible = false
+mainFrame.Parent = screenGui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 8)
+mainCorner.Parent = mainFrame
+
+-- Header
+local header = Instance.new("Frame")
+header.Name = "Header"
+header.Size = UDim2.new(1, 0, 0, 40)
+header.BackgroundColor3 = Color3.fromRGB(45, 120, 200)
+header.BorderSizePixel = 0
+header.Parent = mainFrame
+
+local headerCorner = Instance.new("UICorner")
+headerCorner.CornerRadius = UDim.new(0, 8)
+headerCorner.Parent = header
+
+local headerTitle = Instance.new("TextLabel")
+headerTitle.Size = UDim2.new(0.4, 0, 1, 0)
+headerTitle.Position = UDim2.new(0, 10, 0, 0)
+headerTitle.BackgroundTransparency = 1
+headerTitle.Text = "Developer Console"
+headerTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+headerTitle.TextSize = 16
+headerTitle.Font = Enum.Font.GothamBold
+headerTitle.TextXAlignment = Enum.TextXAlignment.Left
+headerTitle.Parent = header
+
+-- Button Container in Header
+local buttonContainer = Instance.new("Frame")
+buttonContainer.Size = UDim2.new(0.6, -10, 1, 0)
+buttonContainer.Position = UDim2.new(0.4, 0, 0, 0)
+buttonContainer.BackgroundTransparency = 1
+buttonContainer.Parent = header
+
+local buttonLayout = Instance.new("UIListLayout")
+buttonLayout.FillDirection = Enum.FillDirection.Horizontal
+buttonLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+buttonLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+buttonLayout.Padding = UDim.new(0, 5)
+buttonLayout.Parent = buttonContainer
+
+-- Copy Button
+local copyButton = Instance.new("TextButton")
+copyButton.Name = "CopyButton"
+copyButton.Size = UDim2.new(0, 130, 0, 28)
+copyButton.BackgroundColor3 = Color3.fromRGB(60, 150, 255)
+copyButton.BorderSizePixel = 0
+copyButton.Text = "Copy All Debug"
+copyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+copyButton.TextSize = 12
+copyButton.Font = Enum.Font.Gotham
+copyButton.Parent = buttonContainer
+
+local copyCorner = Instance.new("UICorner")
+copyCorner.CornerRadius = UDim.new(0, 4)
+copyCorner.Parent = copyButton
+
+-- Filter Button
+local filterButton = Instance.new("TextButton")
+filterButton.Name = "FilterButton"
+filterButton.Size = UDim2.new(0, 70, 0, 28)
+filterButton.BackgroundColor3 = Color3.fromRGB(70, 70, 80)
+filterButton.BorderSizePixel = 0
+filterButton.Text = "Filter: All"
+filterButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+filterButton.TextSize = 12
+filterButton.Font = Enum.Font.Gotham
+filterButton.Parent = buttonContainer
+
+local filterCorner = Instance.new("UICorner")
+filterCorner.CornerRadius = UDim.new(0, 4)
+filterCorner.Parent = filterButton
+
+-- Clear All Button
+local clearButton = Instance.new("TextButton")
+clearButton.Name = "ClearButton"
+clearButton.Size = UDim2.new(0, 70, 0, 28)
+clearButton.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
+clearButton.BorderSizePixel = 0
+clearButton.Text = "Clear All"
+clearButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+clearButton.TextSize = 12
+clearButton.Font = Enum.Font.Gotham
+clearButton.Parent = buttonContainer
+
+local clearCorner = Instance.new("UICorner")
+clearCorner.CornerRadius = UDim.new(0, 4)
+clearCorner.Parent = clearButton
+
+-- Filter Dropdown
+local filterDropdown = Instance.new("Frame")
+filterDropdown.Name = "FilterDropdown"
+filterDropdown.Size = UDim2.new(0, 100, 0, 150)
+filterDropdown.Position = UDim2.new(1, -175, 1, 5)
+filterDropdown.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+filterDropdown.BorderSizePixel = 0
+filterDropdown.Visible = false
+filterDropdown.ZIndex = 14
+filterDropdown.Parent = header
+
+local dropdownCorner = Instance.new("UICorner")
+dropdownCorner.CornerRadius = UDim.new(0, 4)
+dropdownCorner.Parent = filterDropdown
+
+local dropdownLayout = Instance.new("UIListLayout")
+dropdownLayout.SortOrder = Enum.SortOrder.LayoutOrder
+dropdownLayout.Parent = filterDropdown
+
+-- Create filter options
+local filterTypes = {"All", "Debug", "Info", "Warning", "Error"}
+for i, filterType in ipairs(filterTypes) do
+    	local option = Instance.new("TextButton")
+    	option.Name = filterType
+    	option.Size = UDim2.new(1, 0, 0, 30)
+    	option.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    	option.BorderSizePixel = 0
+    	option.Text = filterType
+    	option.TextColor3 = Color3.fromRGB(255, 255, 255)
+    	option.TextSize = 12
+    	option.Font = Enum.Font.Gotham
+    	option.Parent = filterDropdown
+end
+
+-- Console Output Frame
+local consoleFrame = Instance.new("ScrollingFrame")
+consoleFrame.Name = "ConsoleOutput"
+consoleFrame.Size = UDim2.new(1, -20, 1, -90)
+consoleFrame.Position = UDim2.new(0, 10, 0, 50)
+consoleFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+consoleFrame.BorderSizePixel = 0
+consoleFrame.ScrollBarThickness = 6
+consoleFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+consoleFrame.Parent = mainFrame
+
+local consoleCorner = Instance.new("UICorner")
+consoleCorner.CornerRadius = UDim.new(0, 4)
+consoleCorner.Parent = consoleFrame
+
+local consoleLayout = Instance.new("UIListLayout")
+consoleLayout.SortOrder = Enum.SortOrder.LayoutOrder
+consoleLayout.Padding = UDim.new(0, 2)
+consoleLayout.Parent = consoleFrame
+
+-- Footer
+local footer = Instance.new("Frame")
+footer.Name = "Footer"
+footer.Size = UDim2.new(1, 0, 0, 30)
+footer.Position = UDim2.new(0, 0, 1, -30)
+footer.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+footer.BorderSizePixel = 0
+footer.Parent = mainFrame
+
+local footerCorner = Instance.new("UICorner")
+footerCorner.CornerRadius = UDim.new(0, 8)
+footerCorner.Parent = footer
+
+local statsLabel = Instance.new("TextLabel")
+statsLabel.Size = UDim2.new(1, -20, 1, 0)
+statsLabel.Position = UDim2.new(0, 10, 0, 0)
+statsLabel.BackgroundTransparency = 1
+statsLabel.Text = "Debug: 0 | Info: 0 | Warning: 0 | Error: 0"
+statsLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+statsLabel.TextSize = 11
+statsLabel.Font = Enum.Font.Gotham
+statsLabel.TextXAlignment = Enum.TextXAlignment.Left
+statsLabel.Parent = footer
+
+-- Variables
+local logs = {}
+local selectedLogs = {}
+local currentFilter = "All"
+local logCounts = {Debug = 0, Info = 0, Warning = 0, Error = 0}
+
+-- Functions
+local function getLogColor(logType)
+    	if logType == "Error" then
+        		return Color3.fromRGB(255, 100, 100)
+    	elseif logType == "Warning" then
+        		return Color3.fromRGB(255, 200, 100)
+    	elseif logType == "Info" then
+        		return Color3.fromRGB(100, 150, 255)
+    	elseif logType == "Debug" then
+        		return Color3.fromRGB(100, 255, 150)
+    	end
+    	return Color3.fromRGB(200, 200, 200)
+end
+
+local function updateStats()
+    	local selectedCount = 0
+    	for _ in pairs(selectedLogs) do
+        		selectedCount = selectedCount + 1
+    	end
+    	
+    	if selectedCount > 0 then
+        		statsLabel.Text = string.format("%d selected | Debug: %d | Info: %d | Warning: %d | Error: %d",
+        			selectedCount, logCounts.Debug, logCounts.Info, logCounts.Warning, logCounts.Error)
+    	else
+        		statsLabel.Text = string.format("Debug: %d | Info: %d | Warning: %d | Error: %d",
+        			logCounts.Debug, logCounts.Info, logCounts.Warning, logCounts.Error)
+    	end
+end
+
+local function updateCopyButton()
+    	local selectedCount = 0
+    	for _ in pairs(selectedLogs) do
+        		selectedCount = selectedCount + 1
+    	end
+    	
+    	if selectedCount > 0 then
+        		copyButton.Text = "Copy Selected"
+    	else
+        		copyButton.Text = "Copy All Debug"
+    	end
+end
+
+local function createLogEntry(message, logType, timestamp)
+    	local logEntry = Instance.new("Frame")
+    	logEntry.Name = "LogEntry"
+    	logEntry.Size = UDim2.new(1, -10, 0, 30)
+    	logEntry.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+    	logEntry.BorderSizePixel = 0
+    	logEntry.Parent = consoleFrame
+    	
+    	local logCorner = Instance.new("UICorner")
+    	logCorner.CornerRadius = UDim.new(0, 4)
+    	logCorner.Parent = logEntry
+    	
+    	local logButton = Instance.new("TextButton")
+    	logButton.Size = UDim2.new(1, 0, 1, 0)
+    	logButton.BackgroundTransparency = 1
+    	logButton.Text = ""
+    	logButton.Parent = logEntry
+    	
+    	local timeLabel = Instance.new("TextLabel")
+    	timeLabel.Size = UDim2.new(0, 60, 1, 0)
+    	timeLabel.Position = UDim2.new(0, 5, 0, 0)
+    	timeLabel.BackgroundTransparency = 1
+    	timeLabel.Text = timestamp
+    	timeLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
+    	timeLabel.TextSize = 10
+    	timeLabel.Font = Enum.Font.Code
+    	timeLabel.TextXAlignment = Enum.TextXAlignment.Left
+    	timeLabel.Parent = logEntry
+    	
+    	local typeLabel = Instance.new("TextLabel")
+    	typeLabel.Size = UDim2.new(0, 60, 1, 0)
+    	typeLabel.Position = UDim2.new(0, 70, 0, 0)
+    	typeLabel.BackgroundTransparency = 1
+    	typeLabel.Text = string.upper(logType)
+    	typeLabel.TextColor3 = getLogColor(logType)
+    	typeLabel.TextSize = 10
+    	typeLabel.Font = Enum.Font.GothamBold
+    	typeLabel.TextXAlignment = Enum.TextXAlignment.Left
+    	typeLabel.Parent = logEntry
+    	
+    	local messageLabel = Instance.new("TextLabel")
+    	messageLabel.Size = UDim2.new(1, -140, 1, 0)
+    	messageLabel.Position = UDim2.new(0, 135, 0, 0)
+    	messageLabel.BackgroundTransparency = 1
+    	messageLabel.Text = message
+    	messageLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+    	messageLabel.TextSize = 11
+    	messageLabel.Font = Enum.Font.Code
+    	messageLabel.TextXAlignment = Enum.TextXAlignment.Left
+    	messageLabel.TextTruncate = Enum.TextTruncate.AtEnd
+    	messageLabel.Parent = logEntry
+    	
+    	local logData = {
+        		frame = logEntry,
+        		message = message,
+        		type = logType,
+        		timestamp = timestamp,
+        		id = #logs + 1
+    	}
+    	
+    	table.insert(logs, logData)
+    	
+    	logButton.MouseButton1Click:Connect(function()
+        		if selectedLogs[logData.id] then
+            			selectedLogs[logData.id] = nil
+            			logEntry.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+        		else
+            			selectedLogs[logData.id] = logData
+            			logEntry.BackgroundColor3 = Color3.fromRGB(60, 100, 180)
+        		end
+        		updateCopyButton()
+        		updateStats()
+    	end)
+    	
+    	consoleFrame.CanvasSize = UDim2.new(0, 0, 0, consoleLayout.AbsoluteContentSize.Y)
+    	
+    	return logData
+end
+
+local function addLog(message, logType)
+    	local timestamp = os.date("%H:%M:%S")
+    	logCounts[logType] = logCounts[logType] + 1
+    	
+    	local logData = createLogEntry(message, logType, timestamp)
+    	
+    	if currentFilter == "All" or currentFilter == logType then
+        		logData.frame.Visible = true
+    	else
+        		logData.frame.Visible = false
+    	end
+    	
+    	updateStats()
+    	consoleFrame.CanvasPosition = Vector2.new(0, consoleLayout.AbsoluteContentSize.Y)
+end
+
+local function applyFilter(filterType)
+    	currentFilter = filterType
+    	filterButton.Text = "Filter: " .. filterType
+    	
+    	for _, logData in ipairs(logs) do
+        		if filterType == "All" or logData.type == filterType then
+            			logData.frame.Visible = true
+        		else
+            			logData.frame.Visible = false
+        		end
+    	end
+    	
+    	consoleFrame.CanvasSize = UDim2.new(0, 0, 0, consoleLayout.AbsoluteContentSize.Y)
+end
+
+-- Toggle Console
+toggleButton.MouseButton1Click:Connect(function()
+    	mainFrame.Visible = not mainFrame.Visible
+    	toggleButton.Text = mainFrame.Visible and "<" or ">"
+end)
+
+-- Copy Button
+copyButton.MouseButton1Click:Connect(function()
+    	local textToCopy = ""
+    	local hasSelected = false
+    	
+    	for _ in pairs(selectedLogs) do
+        		hasSelected = true
+        		break
+    	end
+    	
+    	if hasSelected then
+        		for _, logData in pairs(selectedLogs) do
+            			textToCopy = textToCopy .. string.format("[%s] [%s] %s\n", logData.timestamp, string.upper(logData.type), logData.message)
+        		end
+    	else
+        		for _, logData in ipairs(logs) do
+            			if logData.type == "Debug" then
+                				textToCopy = textToCopy .. string.format("[%s] [%s] %s\n", logData.timestamp, string.upper(logData.type), logData.message)
+            			end
+        		end
+    	end
+    	
+    	setclipboard(textToCopy)
+    	copyButton.Text = "Copied!"
+    	wait(2)
+    	updateCopyButton()
+end)
+
+-- Filter Button
+filterButton.MouseButton1Click:Connect(function()
+    	filterDropdown.Visible = not filterDropdown.Visible
+end)
+
+-- Filter Options
+for _, child in ipairs(filterDropdown:GetChildren()) do
+    	if child:IsA("TextButton") then
+        		child.MouseButton1Click:Connect(function()
+            			applyFilter(child.Name)
+            			filterDropdown.Visible = false
+        		end)
+    	end
+end
+
+-- Clear All Button
+clearButton.MouseButton1Click:Connect(function()
+    	for _, logData in ipairs(logs) do
+        		logData.frame:Destroy()
+    	end
+    	logs = {}
+    	selectedLogs = {}
+    	logCounts = {Debug = 0, Info = 0, Warning = 0, Error = 0}
+    	updateStats()
+    	updateCopyButton()
+    	consoleFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+end)
+
+-- Listen to LogService
+LogService.MessageOut:Connect(function(message, messageType)
+    	if messageType == Enum.MessageType.MessageError then
+        		addLog(message, "Error")
+    	elseif messageType == Enum.MessageType.MessageWarning then
+        		addLog(message, "Warning")
+    	elseif messageType == Enum.MessageType.MessageInfo then
+        		addLog(message, "Info")
+    	else
+        		addLog(message, "Debug")
+    	end
+end)
+
+-- Add some example logs
+addLog("Developer Console initialized", "Info")
+addLog("Game loaded successfully", "Info")
+addLog("Workspace.Part.Position = Vector3.new(10, 5, 20)", "Debug")
+
+print("Developer Console loaded!")
