@@ -1,0 +1,225 @@
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+local Window = WindUI:CreateWindow({
+    Title = "Trix Hub",
+    Icon = "door-open", 
+    Author = "by FGS_TTsud1oah",
+    Folder = "MySuperHub",
+    
+    Size = UDim2.fromOffset(580, 460),
+    MinSize = Vector2.new(560, 350),
+    MaxSize = Vector2.new(850, 560),
+    Transparent = true,
+    Theme = "Dark",
+    Resizable = true,
+    SideBarWidth = 200,
+    BackgroundImageTransparency = 0.42,
+    HideSearchBar = true,
+    ScrollBarEnabled = false,
+    
+    User = {
+        Enabled = true,
+        Anonymous = true,
+        Callback = function()
+            print("clicked")
+        end,
+    },
+    
+    KeySystem = {
+        Key = { "m", "," },
+        Note = "Key System",
+        URL = "",
+        SaveKey = false,
+        -- API = {}
+    },
+})
+
+-- Tabs
+local ATab = Window:Tab({
+    Title = "Auto Function",
+    Icon = "bird", 
+    Locked = false,
+})
+
+local STab = Window:Tab({
+    Title = "Settings",
+    Icon = "settings",
+    Locked = false,
+})
+
+-- Global variable for toggle state
+local ABFY = false
+local AutoExecute = true
+
+-- Auto Execute functionality
+local function setupAutoExecute()
+    if AutoExecute then
+        -- Save the script source to execute on rejoin
+        local scriptSource = game:HttpGet("https://raw.githubusercontent.com/yourusername/yourscript.lua") -- Replace with your actual script URL
+        
+        -- Detect when player teleports to new place
+        game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(State)
+            if State == Enum.TeleportState.Started then
+                -- Check if it's a Jujutsu Shenanigans game
+                local success, placeName = pcall(function()
+                    return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+                end)
+                
+                if success and placeName and string.find(string.lower(placeName), "jujutsu") and string.find(string.lower(placeName), "shenanigan") then
+                    -- Queue script to execute on teleport
+                    queue_on_teleport([[
+                        repeat task.wait() until game:IsLoaded()
+                        loadstring(game:HttpGet("https://raw.githubusercontent.com/yourusername/yourscript.lua"))()
+                    ]])
+                end
+            end
+        end)
+        
+        print("Auto Execute enabled - will re-execute on Jujutsu Shenanigans server joins")
+    end
+end
+
+-- Settings Tab Elements
+local AutoExecToggle = STab:Toggle({
+    Title = "Auto Execute",
+    Desc = "Auto execute script on Jujutsu Shenanigans server joins",
+    Icon = "refresh-cw",
+    Type = "Toggle",
+    Value = true,
+    Callback = function(state)
+        AutoExecute = state
+        if state then
+            print("Auto Execute: ENABLED")
+            setupAutoExecute()
+        else
+            print("Auto Execute: DISABLED")
+        end
+    end
+})
+
+-- Initialize Auto Execute
+setupAutoExecute()
+
+-- Elements
+local Toggle = ATab:Toggle({
+    Title = "Auto Black Flash",
+    Desc = "For Yuji",
+    Icon = "bird",
+    Type = "Toggle",
+    Value = false, 
+    Callback = function(state) 
+        ABFY = state
+        if state then
+            print("Auto Black Flash: ENABLED")
+        else
+            print("Auto Black Flash: DISABLED")
+        end
+    end
+})
+
+-- Auto Black Flash Loop (Hooks namecall to detect remote firing)
+task.spawn(function()
+    local Players = game:GetService("Players")
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local LocalPlayer = Players.LocalPlayer
+    
+    local debounce = false
+    local cancelNextDF = false
+    local pendingDF = false
+    
+    -- Monitor for RightActivated every 0.01 seconds
+    task.spawn(function()
+        while true do
+            task.wait(0.01)
+            
+            if pendingDF then
+                -- Check if RightActivated was used
+                pcall(function()
+                    local itadoriService = ReplicatedStorage.Knit.Knit.Services.ItadoriService
+                    if itadoriService then
+                        local re = itadoriService.RE
+                        if re then
+                            local rightActivated = re.RightActivated
+                            if rightActivated then
+                                -- If we detect any activity on RightActivated, cancel the pending DF
+                                -- This check happens every 0.01 seconds while DF is pending
+                            end
+                        end
+                    end
+                end)
+            end
+        end
+    end)
+    
+    -- Hook into namecall to detect when remotes are fired
+    local oldNamecall
+    oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+        local args = {...}
+        local method = getnamecallmethod()
+        
+        -- Check if RightActivated is being fired - cancel pending Divergent Fist
+        if method == "FireServer" and self.Name == "RightActivated" then
+            local parent = self.Parent
+            if parent and parent.Name == "RE" then
+                local service = parent.Parent
+                if service and service.Name == "ItadoriService" then
+                    -- RightActivated detected! Cancel the pending Divergent Fist
+                    if pendingDF then
+                        cancelNextDF = true
+                        pendingDF = false
+                        print("Cancelled pending Divergent Fist due to RightActivated")
+                    end
+                end
+            end
+        end
+        
+        -- Check if it's a FireServer call to the Divergent Fist remote
+        if method == "FireServer" and self.Name == "Activated" then
+            local parent = self.Parent
+            if parent and parent.Name == "RE" then
+                local service = parent.Parent
+                if service and service.Name == "DivergentFistService" then
+                    -- Detected Divergent Fist being used!
+                    if ABFY and not debounce then
+                        debounce = true
+                        pendingDF = true
+                        cancelNextDF = false
+                        
+                        -- Fire again after 0.31 seconds (unless cancelled)
+                        task.spawn(function()
+                            task.wait(0.31)
+                            
+                            if ABFY and not cancelNextDF then
+                                pcall(function()
+                                    local character = LocalPlayer.Character
+                                    if character then
+                                        local moveset = character:FindFirstChild("Moveset")
+                                        if moveset then
+                                            local divergentFist = moveset:FindFirstChild("Divergent Fist")
+                                            if divergentFist then
+                                                local newArgs = {divergentFist}
+                                                ReplicatedStorage.Knit.Knit.Services.DivergentFistService.RE.Activated:FireServer(unpack(newArgs))
+                                                print("Auto Black Flash executed!")
+                                            end
+                                        end
+                                    end
+                                end)
+                            elseif cancelNextDF then
+                                print("Auto Black Flash cancelled")
+                            end
+                            
+                            pendingDF = false
+                            cancelNextDF = false
+                            task.wait(0.2)
+                            debounce = false
+                        end)
+                    end
+                end
+            end
+        end
+        
+        return oldNamecall(self, ...)
+    end)
+    
+    print("Auto Black Flash active! Use Divergent Fist and it will auto-fire after 0.31s")
+    print("RightActivated will cancel pending Divergent Fist")
+end)
