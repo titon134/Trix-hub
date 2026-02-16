@@ -54,7 +54,7 @@ local AutoExecute = true
 local function setupAutoExecute()
     if AutoExecute then
         -- Save the script source to execute on rejoin
-        local scriptSource = game:HttpGet("https://raw.githubusercontent.com/yourusername/yourscript.lua") -- Replace with your actual script URL
+        local scriptSource = game:HttpGet("https://raw.githubusercontent.com/titon134/Trix-hub/refs/heads/main/JJS") -- Replace with your actual script URL
         
         -- Detect when player teleports to new place
         game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(State)
