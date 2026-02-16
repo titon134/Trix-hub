@@ -1,3 +1,4 @@
+local sS = loadstring(game:HttpGet("https://raw.githubusercontent.com/TTsudloah174/Trix-Hub-actual-script-/refs/heads/main/JJS"))()
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = WindUI:CreateWindow({
     Title = "Trix Hub",
